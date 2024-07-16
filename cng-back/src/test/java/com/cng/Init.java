@@ -20,11 +20,26 @@ public class Init {
 
 	@Test
 	public void doWork() {
-		memRepo.save(Member.builder().username("member").password(encoder.encode("abcd")).role(Role.ROLE_MEMBER)
-				.enabled(true).build());
-		memRepo.save(Member.builder().username("manager").password(encoder.encode("abcd")).role(Role.ROLE_MANAGER)
-				.enabled(true).build());
-		memRepo.save(Member.builder().username("admin").password(encoder.encode("abcd")).role(Role.ROLE_ADMIN)
-				.enabled(true).build());
+		memRepo.save(Member.builder()
+				.username("admin")
+				.realname("admin")
+				.password(encoder.encode("cngcctv1!"))
+				.role(Role.ROLE_ADMIN)
+				.enabled(true)
+				.build());
+		memRepo.save(Member.builder()
+				.username("housekjh")
+				.realname("김지훈")
+				.password(encoder.encode("cngcctv1!"))
+				.role(Role.ROLE_MANAGER)
+				.enabled(true)
+				.build());
+		memRepo.save(Member.builder()
+				.username("member")
+				.realname("member")
+				.password(encoder.encode("cngcctv1!"))
+				.role(Role.ROLE_MEMBER)
+				.enabled(true)
+				.build());
 	}
 }

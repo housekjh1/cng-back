@@ -21,8 +21,12 @@ import lombok.ToString;
 public class Member {
 	@Id
 	private String username;
+	private String realname;
 	private String password;
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	private boolean enabled;
+	@Builder.Default
+	private boolean enabled = false;
+	@Builder.Default
+	private boolean punished = false;
 }
