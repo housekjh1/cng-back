@@ -11,8 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
 import com.cng.config.filter.JWTAuthenticationFilter;
 import com.cng.config.filter.JWTAuthorizationFilter;
 import com.cng.persistence.MemberRepository;
@@ -21,35 +19,34 @@ import com.cng.persistence.MemberRepository;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-	private MemberRepository memRepo;
+    @Autowired
+    private MemberRepository memRepo;
 
-	@Autowired
-	private AuthenticationConfiguration authenticationConfiguration;
+    @Autowired
+    private AuthenticationConfiguration authenticationConfiguration;
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
 
-		http.csrf(csrf -> csrf.disable());
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/member/**").authenticated()
+                .requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll());
 
-		http.authorizeHttpRequests(auth -> auth.requestMatchers(new AntPathRequestMatcher("/member/**")).authenticated()
-				.requestMatchers(new AntPathRequestMatcher("/manager/**")).hasAnyRole("MANAGER", "ADMIN")
-				.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN").anyRequest().permitAll());
+        http.formLogin(frm -> frm.disable());
+        http.httpBasic(basic -> basic.disable());
+        http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		http.formLogin(frmLogin -> frmLogin.disable());
+        http.addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()));
+        http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
 
-		http.httpBasic(basic -> basic.disable());
-
-		http.sessionManagement(ssmn -> ssmn.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-		http.addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()));
-		http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
-
-		return http.build();
-	}
+        return http.build();
+    }
 }
