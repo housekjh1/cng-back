@@ -40,7 +40,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 		String username = JWT.require(Algorithm.HMAC256("com.cng.jwt")).build().verify(jwtToken).getClaim("username").asString();
 		
 		Optional<Member> opt = memRepo.findById(username);
-		if (!opt.isPresent()) {
+		if (!opt.isPresent() || !opt.get().isEnabled() || opt.get().isPunished()) {
 			filterChain.doFilter(request, response);
 			return;
 		}

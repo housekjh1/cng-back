@@ -13,8 +13,8 @@ public class CustomConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://59.19.12.158:3000");
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOriginPattern("http://59.19.12.158:3000");
+        config.addAllowedOriginPattern("http://localhost:3000");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("Authorization");
