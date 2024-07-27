@@ -45,12 +45,10 @@ public class MemberService {
 		String jwtToken = hasToken.replace("Bearer ", "");
 		String username = null;
 		Member tmp = null;
-		String realname = null;
 		try {
 			username = JWT.require(Algorithm.HMAC256("com.cng.jwt")).build().verify(jwtToken).getClaim("username")
 					.asString();
 			tmp = memRepo.findById(username).get();
-			realname = tmp.getRealname();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.builder().key("error").value("findError").build();
@@ -60,6 +58,22 @@ public class MemberService {
 		} else if (tmp.isPunished()) {
 			return Response.builder().key("error").value("punished").build();
 		}
-		return Response.builder().key("success").value(realname).build();
+		return Response.builder().key("success").value(tmp.getRealname()).data(tmp).build();
+	}
+
+	public Response changePW(String username, String password) {
+
+		Integer result = null;
+		try {
+			result = memRepo.updatePassword(username, encoder.encode(password));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.builder().key("error").value("updateError").build();
+		}
+		if (result > 0) {
+			return Response.builder().key("success").value("updated").build();
+		} else {
+			return Response.builder().key("error").value("notUpdated").build();
+		}
 	}
 }

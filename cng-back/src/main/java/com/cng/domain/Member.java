@@ -1,5 +1,9 @@
 package com.cng.domain;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,4 +33,7 @@ public class Member {
 	private boolean enabled = false;
 	@Builder.Default
 	private boolean punished = false;
+	@Column(name = "create_date", nullable = false, updatable = false)
+	@Builder.Default
+	private ZonedDateTime createDate = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
 }

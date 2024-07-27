@@ -17,4 +17,6 @@ public class Response {
 
 	private String key;
 	private String value;
+	@Builder.Default
+	private Object data = null;
 }
