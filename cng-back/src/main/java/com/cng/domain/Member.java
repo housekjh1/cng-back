@@ -28,7 +28,8 @@ public class Member {
 	private String realname;
 	private String password;
 	@Enumerated(EnumType.STRING)
-	private Role role;
+	@Builder.Default
+	private Role role = Role.ROLE_MEMBER;
 	@Builder.Default
 	private boolean enabled = false;
 	@Builder.Default

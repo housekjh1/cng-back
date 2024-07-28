@@ -3,6 +3,8 @@ package com.cng.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -76,4 +78,38 @@ public class MemberService {
 			return Response.builder().key("error").value("notUpdated").build();
 		}
 	}
+
+	public Page<Member> getUserList(String value, int page) {
+		PageRequest pageRequest = PageRequest.of(page, 100);
+		return memRepo.findByUsernameContainingOrRealnameContaining(value, value, pageRequest);
+	}
+
+	public long getUserCount(String value) {
+		return memRepo.countByUsernameContainingOrRealnameContaining(value);
+	}
+
+	public Response userEdit(String username) {
+		Member tmp = null;
+		try {
+			tmp = memRepo.findById(username).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.builder().key("error").value("findError").build();
+		}
+		return Response.builder().key("success").value("success").data(tmp).build();
+	}
+
+	public Page<Member> getDisabledMembers(int page) {
+		PageRequest pageRequest = PageRequest.of(page, 100);
+		return memRepo.findByEnabledFalse(pageRequest);
+	}
+
+	public Page<Member> getPunishedMembers(int page) {
+		PageRequest pageRequest = PageRequest.of(page, 100);
+		return memRepo.findByPunishedTrue(pageRequest);
+	}
+	
+	public int updateUser(String username, Role role, boolean enabled, boolean punished) {
+        return memRepo.updateUser(username, role, enabled, punished);
+    }
 }
