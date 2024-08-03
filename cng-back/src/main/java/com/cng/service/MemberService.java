@@ -25,14 +25,21 @@ public class MemberService {
 	private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	public String join(String username, String realname, String password) {
+		System.out.println(username + ' ' + realname + ' ' + password);
 
-		Optional<Member> opt = memRepo.findById(username);
+		Optional<Member> opt = Optional.empty();
 
-		if (!opt.isPresent()) {
-			memRepo.save(Member.builder().username(username).realname(realname).password(encoder.encode(password))
-					.role(Role.ROLE_MEMBER).build());
+		try {
+			opt = memRepo.findById(username);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (opt.isEmpty()) {
+			memRepo.save(
+					Member.builder().username(username).realname(realname).password(encoder.encode(password)).build());
 			return "ok";
-		} else if (opt.get().getUsername().equals(username)) {
+		} else if (opt.isPresent() && opt.get().getUsername().equalsIgnoreCase(username)) {
 			return "usernameDuplication";
 		} else {
 			return "error";
@@ -108,8 +115,8 @@ public class MemberService {
 		PageRequest pageRequest = PageRequest.of(page, 100);
 		return memRepo.findByPunishedTrue(pageRequest);
 	}
-	
+
 	public int updateUser(String username, Role role, boolean enabled, boolean punished) {
-        return memRepo.updateUser(username, role, enabled, punished);
-    }
+		return memRepo.updateUser(username, role, enabled, punished);
+	}
 }
